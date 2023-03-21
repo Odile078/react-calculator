@@ -2,112 +2,106 @@ import { useState } from "react";
 import CustomButton from "./components/CustomButton";
 
 const App = () => {
-  const [result, setResult] = useState("0");
-  const [firstNumber, setFirstNumber] = useState(null);
-  const [secondNumber, setSecondNumber] = useState(null);
-  const [operand, setOperand] = useState(null);
-  const [operation, setOperation] = useState("");
-  const onClickNumber = (number) => {
-    if (result === "0" && !firstNumber) {
-      console.log("number", number);
-      setResult(number);
-      setFirstNumber(number);
-      setOperation(operation + Number(number));
+  const [firstNumber, setFirstNumber] = useState("");
+  const [secondNumber, setSecondNumber] = useState("");
+  const [operator, setOperator] = useState("");
+  const handlePickNumber = (number) => {
+    if (!firstNumber) {
+      Number(firstNumber) === 0
+        ? setFirstNumber(number)
+        : setFirstNumber(firstNumber + number);
     } else {
-      setResult(result + number);
-      setOperation(operation + Number(number));
+      if (operator) {
+        Number(secondNumber) === 0
+          ? setSecondNumber(number)
+          : setSecondNumber(secondNumber + number);
+      } else {
+        Number(firstNumber) === 0
+          ? setFirstNumber(number)
+          : setFirstNumber(firstNumber + number);
+      }
     }
-    console.log("clicked", typeof number);
   };
-  const handleChangeOperation = (operator) => {
-    if (operation) {
-      setOperation(operation + operator);
-    } else {
-      if (result !== "0") {
-        // switch (operator) {
-        //   case "÷":
-        //     setOperation(Number(result) / firstNumber);
-        //     break;
-        //   case "X":
-        //     console.log("calculate");
-        //     break;
-        //   case "-":
-        //     console.log("calculate");
-        //     break;
-        //   case "+":
-        //     console.log("calculate");
-        //     break;
-        //   default:
-        //     return null;
-        // }
-        setOperation(Number(result) + operator + null);
-      } else return;
-    }
-
-    // if (result.includes)
-    console.log("operation", result + operator, operator, "result:", result);
-  };
-  console.log("operation current", operation);
-  const handleCalculate = (operator) => {
-    console.log("calculate", operator, operation);
+  const calculate = (operator) => {
+    let result;
     switch (operator) {
       case "÷":
-        console.log("calculate");
+        result = Number(firstNumber) / Number(secondNumber);
         break;
       case "X":
-        console.log("calculate");
+        result = Number(firstNumber) * Number(secondNumber);
         break;
       case "-":
-        console.log("calculate");
+        result = Number(firstNumber) - Number(secondNumber);
         break;
       case "+":
-        console.log("calculate");
+        result = Number(firstNumber) + Number(secondNumber);
+        break;
+      case "%":
+        result = Number(firstNumber) % Number(secondNumber);
         break;
       default:
-        return null;
+        return;
     }
+    return result;
   };
-  const handlePickOperator = (operator) => {
+  const handlePickOperator = (pickedOperator) => {
     if (
-      operator === "÷" ||
-      operator === "X" ||
-      operator === "-" ||
-      operator === "+"
+      pickedOperator === "÷" ||
+      pickedOperator === "X" ||
+      pickedOperator === "-" ||
+      pickedOperator === "+" ||
+      pickedOperator === "%"
     ) {
-      handleChangeOperation(operator);
-    } else if (operator === "=") {
-      handleCalculate(operator);
+      if (operator) {
+        const newFirstNumber = calculate(pickedOperator);
+        setSecondNumber("");
+        setFirstNumber(newFirstNumber);
+        setOperator(pickedOperator);
+      } else setOperator(pickedOperator);
+    } else if (pickedOperator === "=") {
+      const newFirstNumber = calculate(operator);
+      setFirstNumber(newFirstNumber);
+      setSecondNumber("");
+      setOperator("");
     } else return;
   };
-  const reset = () => {
-    setFirstNumber(null);
-    setOperand(null);
-    setResult("0");
-    setOperation("");
+  const handleReset = () => {
+    setFirstNumber("");
+    setSecondNumber("");
+    setOperator("");
   };
-  const handleChangeNbrSign = () => setResult(result * -1);
+  const handleChangeNumberSign = () =>
+    firstNumber
+      ? setFirstNumber(firstNumber * -1)
+      : secondNumber
+      ? setSecondNumber(secondNumber * -1)
+      : null;
+
   return (
     <div className="bg-gray-300 min-h-screen flex justify-center items-center">
       <div className="mx-auto max-w-5xl p-4">
         <div className="flex flex-col">
           <div className="bg-gray-600">
             <p className="w-full border border-gray-300 px-10 py-6 text-end text-3xl font-bold text-white">
-              {result}
+              {secondNumber || firstNumber || "0"}
             </p>
           </div>
           <div className="flex">
             <div className="flex-1">
               <div className="grid grid-cols-3">
-                <CustomButton action={reset}>AC</CustomButton>
-                <CustomButton action={handleChangeNbrSign}>+/-</CustomButton>
-                <CustomButton action={onClickNumber}>%</CustomButton>
+                <CustomButton action={handleReset}>AC</CustomButton>
+                <CustomButton action={handleChangeNumberSign}>+/-</CustomButton>
+                <CustomButton action={() => handlePickOperator("%")}>
+                  %
+                </CustomButton>
               </div>
               <div className="grid grid-cols-3">
                 {["7", "8", "9", "4", "5", "6", "1", "2", "3", "0", "."].map(
                   (number, index) => (
                     <CustomButton
                       key={index}
-                      action={() => onClickNumber(number)}
+                      action={() => handlePickNumber(number)}
                       spanned={number === "0" ? true : false}
                     >
                       {number}
