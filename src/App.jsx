@@ -5,21 +5,14 @@ const App = () => {
   const [firstNumber, setFirstNumber] = useState("");
   const [secondNumber, setSecondNumber] = useState("");
   const [operator, setOperator] = useState("");
+
   const handlePickNumber = (number) => {
-    if (!firstNumber) {
-      Number(firstNumber) === 0
-        ? setFirstNumber(number)
-        : setFirstNumber(firstNumber + number);
+    if (operator) {
+      setSecondNumber(
+        Number(secondNumber) === 0 ? number : secondNumber + number
+      );
     } else {
-      if (operator) {
-        Number(secondNumber) === 0
-          ? setSecondNumber(number)
-          : setSecondNumber(secondNumber + number);
-      } else {
-        Number(firstNumber) === 0
-          ? setFirstNumber(number)
-          : setFirstNumber(firstNumber + number);
-      }
+      setFirstNumber(Number(firstNumber) === 0 ? number : firstNumber + number);
     }
   };
   const calculate = (operator) => {
